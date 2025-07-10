@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class UserModel(BaseModel):
+class ProductModel(BaseModel):
   _id: str
   title: str
   description: str
