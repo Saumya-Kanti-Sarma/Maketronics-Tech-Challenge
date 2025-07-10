@@ -5,3 +5,4 @@ collection = db["products"]
 
 async def getAllProducts():
   return [ProductModel(**item) async for item in collection.find()]
+
