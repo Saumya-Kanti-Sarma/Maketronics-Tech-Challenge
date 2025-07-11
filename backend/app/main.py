@@ -45,6 +45,10 @@ def home():
                 "filter by keywords": f"{uri}/api/filter?keywords=python-books",
                 "filter by price range": f"{uri}/api/filter?keywords=python-books&l_price=0&f_price=1000", 
                 "filter by low to high": f"{uri}/api/filter?keywords=python-books&low_to_high=true", 
+            },{
+                "method": "GET",
+                "path": f"{uri}/api/keywords",
+                "description": "🗑 Will return a list of all keywords"
             }
         ],
         "About me": "I'm Saumya Sarma, a jr. full-stack developer ",

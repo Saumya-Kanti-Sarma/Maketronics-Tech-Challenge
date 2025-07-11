@@ -15,11 +15,14 @@ def product_serializer(product) -> dict:
         "keyword": product["keyword"]
     }
 
+"""Create"""
 @router.post("/", response_model=dict)
 def create_product(product: CreateProductModel):
     result = collection.insert_one(product.model_dump())
     return {"message":"Product Created"}
 
+
+"""Get All"""
 @router.get("/", response_model=list)
 def get_all_products():
     products = collection.find()
@@ -54,6 +57,20 @@ def get_filters(
     products = collection.find(query)
     return [product_serializer(item) for item in products]
 
+"""Get All Keywords"""
+@router.get("/keywords", response_model=list)
+def get_keywords():
+    all_docs = collection.find({}, {"keyword": 1, "_id": 0}).to_list(length=None)
+    keywords = set()
+    for doc in all_docs:
+        if "keyword" in doc and isinstance(doc["keyword"], list):
+            keywords.update(doc["keyword"])
+    
+    return list(keywords)
+    
+
+
+"""Get One"""
 @router.get("/{product_id}", response_model=dict)
 def get_product(product_id: str):
     product = collection.find_one({"_id": ObjectId(product_id)})
@@ -61,6 +78,7 @@ def get_product(product_id: str):
         raise HTTPException(status_code=404, detail="product not found")
     return product_serializer(product)
 
+"""Update One"""
 @router.put("/{product_id}", response_model=dict)
 def update_product(product_id: str, product: UpdateProductModel):
     update_data = {k: v for k, v in product.dict().items() if v is not None}
@@ -70,6 +88,8 @@ def update_product(product_id: str, product: UpdateProductModel):
     updated = collection.find_one({"_id": ObjectId(product_id)})
     return product_serializer(updated)
 
+
+"""Delete One"""
 @router.delete("/{product_id}", response_model=dict)
 def delete_product(product_id: str):
     result = collection.delete_one({"_id": ObjectId(product_id)})
