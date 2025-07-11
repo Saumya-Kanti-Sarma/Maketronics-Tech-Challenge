@@ -1,154 +1,100 @@
-"use client";
-import { useEffect, useState } from "react";
-import Cart from "@/component/Cart/Cart";
-import axios from "axios";
-import { Menu } from "lucide-react"; // for toggle icon
+'use client';
 
-interface Product {
-  title: string;
-  link: string;
-  image: string;
-  price: string;
-  keyword: string[];
-}
+import { useState } from 'react';
 
+export default function HomePage() {
+  const [search, setSearch] = useState(''); //stores search values
+  const [clickedAsideBtn, setclickedAsidebtn] = useState(false); // Checks if aside Btn is clicked
+  const handleAside = () => setclickedAsidebtn((prev) => !prev)
+  const suggestions = [
+    "Java Books",
+    "Python Books",
+    "Java books Under 2000",
+    "JavaScript Books"
+  ];
 
-
-export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filtered, setFiltered] = useState<Product[]>([]);
-  const [categories, setcategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingCategory, setLoadingCategory] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showSidebar, setShowSidebar] = useState(false);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await axios("/api/products");
-        setProducts(res.data);
-        setFiltered(res.data); // initially all products
-
-        const allKeywords: string[] = Array.from(
-          new Set(
-            res.data.flatMap((item: Product) => item.keyword.map(k => k.trim().toLowerCase()))
-          )
-        );
-        setcategories(allKeywords)
-        setLoadingCategory(false)
-
-      } catch (error) {
-        console.error("cannot fetch data", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  // when category is selected, filter
-  useEffect(() => {
-    setLoading(true);
-
-    const timeout = setTimeout(() => {
-      if (selectedCategory) {
-        const filteredProducts = products.filter((product) =>
-          product.keyword.map(k => k.toLowerCase()).includes(selectedCategory.toLowerCase())
-        );
-        setFiltered(filteredProducts);
-      } else {
-        setFiltered(products);
-      }
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timeout);
-  }, [selectedCategory, products]);
-
+  const filtered = suggestions.filter(item =>
+    item.toLowerCase().includes(search.toLowerCase()) && search.length > 0
+  );
 
   return (
-    <div className="flex h-[calc(100dvh-60px)] w-full" onClick={() => setShowSidebar(false)}>
-
-
-      {/* Sidebar */}
+    <div className={`bg-[#202120] w-full h-[100dvh] flex justify-center items-center relative`}>
+      <div className={`absolute left-1 top-1 transision duration-220 ease-in-out  ${clickedAsideBtn ? 'left-[220px]' : ''}`}>
+        <button
+          className={`bg-transparent border-none cursor-pointer opacity-70 transition-opacity duration-200 ease-in-out hover:opacity-100 `}
+          onClick={handleAside}
+        >
+          <img
+            src="/menu.svg"
+            alt="menu-btn"
+            className={`w-[30px] aspect-square transition-transform duration-300 ease-in-out
+        ${clickedAsideBtn ? "rotate-180" : "rotate-0"}`}
+          />
+        </button>
+      </div>
       <aside
-        className={`bg-white shadow-md z-40 w-full max-lg:absolute  max-lg:top-0 max-lg:left-0 max-lg:h-full max-lg:w-[220px] transition-transform duration-300 ${showSidebar ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:relative md:flex md:w-[280px] p-4`}
+        className={` absolute h-full bg-[#0e0e0e67] transition-all duration-300 ease-in-out overflow-hidden z-100 w-[220px]
+  ${clickedAsideBtn ? "left-[0]" : "left-[-220px]"}`}
       >
-        <div className="w-full">
-          <h1 className="text-lg font-bold mb-4 text-blue-800">All Categories</h1>
-          <ul className="space-y-2 w-full">
-            {loadingCategory ? (
-              Array.from({ length: 8 }).map((_, idx) => (
-                <li key={idx} className="h-10 w-full bg-gray-300 rounded animate-pulse mx-[auto] my-0 mb-10"></li>
-              ))
-            ) : (
-              <>
-                <li
-                  onClick={() => setSelectedCategory(null)}
-                  className={`cursor-pointer hover:text-blue-500 ${selectedCategory === null ? "text-blue-600 font-semibold" : ""
-                    }`}
-                >
-                  All
-                </li>
-                {categories.map((cat, index) => (
-                  <li
-                    key={index}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setShowSidebar(false);
-                    }}
-                    className={`cursor-pointer hover:text-blue-500 ${selectedCategory?.toLowerCase() === cat.toLowerCase()
-                      ? "text-blue-600 font-semibold"
-                      : ""
-                      }`}
-                  >
-                    {cat}
-                  </li>
-                ))}
-              </>
-            )}
-          </ul>
-        </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="p-4 flex-1 h-full overflow-y-auto overflow-x-hidden">
+      <section className={`flex-1 h-full flex flex-col justify-center gap-[10vh] items-center`}>
 
-        <div className="flex justify-start gap-5 items-center">
-          {/* Sidebar toggle for small screens */}
-          <button
-            className="w-[35px] h-[35px] bg-blue-700 text-white rounded flex justify-center items-center"
-            onClick={(e) => {
-              e.stopPropagation(); // <-- prevents parent div's click
-              setShowSidebar(!showSidebar);
-            }}
-          >
-            <Menu size={20} />
+        {/* Title */}
+        <div className="flex flex-col w-full gap-3 justify-center items-center">
+          <h1 className="text-6xl font-bold text-white text-center
+          max-lg:text-5xl max-md:text-3xl max-sm:text-[18px]
+          ">
+            Welcome to Universal <b className="text-[#ee6868] underline underline-offset-9 decoration-3">Book Search</b>
+          </h1>
+          <p className="text-2xl text-white text-center
+          max-lg:text-[18px] max-md:text-[16px] max-sm:text-[14px]
+          ">Get access to 1000+ books across variety of topics</p>
+        </div>
+
+        {/* Input Area */}
+        <div className="w-[98%] max-w-[1200px] relative mb-20">
+          {/* Input */}
+          <input
+            type="text"
+            name="searchbox"
+            id="search-bar"
+            placeholder="Search any books"
+            className="bg-[#303131] h-[80px] w-full rounded-3xl border-none text-white pl-5 text-[18px] outline-none"
+            autoFocus
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          {/* Search Button */}
+          <button className="absolute border-none right-[3%] h-full bg-transparent">
+            <img src="/search.svg" alt="search" id="search-img"
+              className="w-[25px] aspect-square object-cover invert-100" />
           </button>
 
-          <h1 className="text-2xl font-bold text-blue-700">Product List</h1>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {loading
-            ? Array.from({ length: 8 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl shadow-md p-6 animate-pulse space-y-4"
-              >
-                <div className="w-full h-40 bg-gray-300 rounded-md" />
-                <div className="h-4 bg-gray-300 rounded w-3/4" />
-                <div className="h-4 bg-gray-300 rounded w-1/2" />
-                <div className="h-8 bg-gray-300 rounded w-full" />
+          {/* Suggestions */}
+          {
+            filtered.length > 0 && (
+              <div className="w-[98%] max-w-[1200px] absolute left-2 top-[88px] z-10" style={{ display: filtered[0] == search ? "none" : "" }}>
+                <ul className="text-[#ffffff94] w-full">
+                  {
+                    filtered.map((item, index) => (
+                      <li
+                        key={index}
+                        className="border-[1px] border-transparent px-5 py-3 w-full rounded-[4px] opacity-60
+                        transition duration-220 hover:bg-[#ffffff04] hover:border-[#ffffff2f] hover:opacity-100"
+                        onClick={() => setSearch(item)}
+                      >
+                        {item}
+                      </li>
+                    ))
+                  }
+                </ul>
               </div>
-            ))
-            : filtered.map((product, index) => (
-              <Cart key={index} title={product.title} image={product.image} link={product.link} price={product.price} keyword={product.keyword} />
-            ))}
+            )
+          }
         </div>
-      </div>
+      </section>
     </div>
   );
 }
