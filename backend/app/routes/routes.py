@@ -18,7 +18,7 @@ def product_serializer(product) -> dict:
 @router.post("/", response_model=dict)
 def create_product(product: CreateProductModel):
     result = collection.insert_one(product.model_dump())
-    return {"message":"Product Created", "data":result}
+    return {"message":"Product Created"}
 
 @router.get("/", response_model=list)
 def get_all_products():
