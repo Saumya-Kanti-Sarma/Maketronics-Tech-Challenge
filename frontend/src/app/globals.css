@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-gray-100 text-gray-800;
-}
 
 ::-webkit-scrollbar {
-  width: 12px;
+  display: none;
 }
 
 /* track (background) */
@@ -24,4 +21,24 @@ body {
 /* on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+@keyframes fadeLoop {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.fade-loop {
+  animation: fadeLoop 2s ease-in-out infinite;
+}
+
+.opacity-animation {
+  animation: fadeLoop 2s ease-in-out infinite;
 }

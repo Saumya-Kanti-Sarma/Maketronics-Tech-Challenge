@@ -105,5 +105,5 @@ def getfromFlipkart(url,keyword):
 
 # # getData()
 
-getFromAmazon("https://www.amazon.in/s?k=business+books","business-books")
+getFromAmazon("https://www.amazon.in/s?k=javascript+book",["pogramming-books", "javascript", "computer"])
 
