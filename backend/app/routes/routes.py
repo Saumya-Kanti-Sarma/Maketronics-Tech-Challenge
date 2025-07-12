@@ -65,12 +65,12 @@ def get_filters(
 """Get All Keywords"""
 @router.get("/keywords", response_model=list)
 def get_keywords():
-    all_docs = collection.find({}, {"keyword": 1, "_id": 0}).to_list(length=None)
+    all_docs = collection.find({}, {"keyword": 1, "_id": 0})
     keywords = set()
     for doc in all_docs:
         if "keyword" in doc and isinstance(doc["keyword"], list):
             keywords.update(doc["keyword"])
-    
+
     return list(keywords)
     
 
