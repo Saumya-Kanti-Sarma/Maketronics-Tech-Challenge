@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from bson import ObjectId
 from app.db.database import collection
 from app.models.models import CreateProductModel, UpdateProductModel
@@ -22,40 +22,45 @@ def create_product(product: CreateProductModel):
     return {"message":"Product Created"}
 
 
-"""Get All"""
+"""Get All""" 
 @router.get("/", response_model=list)
-def get_all_products():
-    products = collection.find()
+def get_all_products(
+    page: int = Query(1, ge=1),  # default page=1, must be >= 1
+):
+    limit = 5
+    skip = (page - 1) * limit
+    products = collection.find().skip(skip).limit(limit)
     return [product_serializer(product) for product in products]
 
 
-"""Filter"""
+"""Filter""" #/api/filter?page=1&low_to_high=true&keywords=graphics
+
 @router.get("/filter", response_model=List[dict])
 def get_filters(
     keywords: Optional[str] = None,
-    f_price: Optional[str] = None,
-    l_price: Optional[str] = None,
-    low_to_high:Optional[str]=None,
+    f_price: Optional[float] = None,
+    l_price: Optional[float] = None,
+    low_to_high: Optional[str] = None,
+    page: int = Query(1, ge=1),  # default page=1, must be >= 1
 ):
     query = {}
-    # filter keywords
+    # keyword filter
     if keywords:
-        query["$or"] =[{"keyword": {"$regex": keywords, "$options": "i"}}]
-
-    # Price range 
+        query["$or"] = [{"keyword": {"$regex": keywords, "$options": "i"}}]
+    # price filters
     if f_price is not None and l_price is not None:
         query["price"] = {"$gte": f_price, "$lte": l_price}
-
-    # Price Limit
     elif l_price is not None:
         query["price"] = {"$lte": l_price}
+    limit = 5
+    skip = (page - 1) * limit
+    # sorting
+    if low_to_high == "true":
+        cursor = collection.find(query).sort("price", 1).skip(skip).limit(limit)
+    else:
+        cursor = collection.find(query).skip(skip).limit(limit)
 
-    if(low_to_high =="true"):
-        products = collection.find(query).sort("price", 1)
-        return [product_serializer(item) for item in products]
-
-    products = collection.find(query)
-    return [product_serializer(item) for item in products]
+    return [product_serializer(item) for item in cursor]
 
 """Get All Keywords"""
 @router.get("/keywords", response_model=list)

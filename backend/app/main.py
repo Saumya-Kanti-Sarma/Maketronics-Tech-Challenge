@@ -1,11 +1,19 @@
 from fastapi import FastAPI
 from app.routes.routes import router
+from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 uri = os.getenv("URI")
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(router, prefix="/api")
 @app.get("/", tags=["Homepage"])
 def home():
